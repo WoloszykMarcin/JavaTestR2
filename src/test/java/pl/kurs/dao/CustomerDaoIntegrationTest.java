@@ -14,7 +14,6 @@ import pl.kurs.config.JpaConfig;
 import pl.kurs.models.Customer;
 
 import javax.annotation.Resource;
-import javax.persistence.EntityManagerFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,9 +31,6 @@ public class CustomerDaoIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private EntityManagerFactory entityManagerFactory;
 
     @Test
     public void shouldSaveCustomer() {
