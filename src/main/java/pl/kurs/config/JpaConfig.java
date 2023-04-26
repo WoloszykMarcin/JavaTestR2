@@ -2,10 +2,8 @@ package pl.kurs.config;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -20,7 +18,13 @@ import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan(basePackages = "pl.kurs.dao")
+@PropertySource("classpath:application.properties")
 public class JpaConfig {
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer getPSPC() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     @Profile({"dev", "prod", "!dev & !prod"})
     @Bean
@@ -44,12 +48,12 @@ public class JpaConfig {
 
     @Profile({"prod", "!dev & !prod"})
     @Bean
-    static DataSource getDataSourceProd() {
+    public DataSource getDataSourceProd(Environment env) {
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setUrl("jdbc:mysql://localhost:3306/library?useSSL=false&serverTimezone=UTC");
-        dataSource.setUsername("root");
-        dataSource.setPassword("root");
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setUrl(env.getProperty("spring.datasource.mysql.url"));
+        dataSource.setUsername(env.getProperty("spring.datasource.mysql.username"));
+        dataSource.setPassword(env.getProperty("spring.datasource.mysql.password"));
+        dataSource.setDriverClassName(env.getProperty("spring.datasource.mysql.driverClassName"));
         dataSource.setMinIdle(5);
         dataSource.setMaxIdle(100);
         return dataSource;
@@ -67,12 +71,12 @@ public class JpaConfig {
 
     @Profile("dev")
     @Bean
-    static DataSource getDataSourceDev() {
+    public DataSource getDataSourceDev(Environment env) {
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setUrl("jdbc:h2:mem:testdb");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("");
-        dataSource.setDriverClassName("org.h2.Driver");
+        dataSource.setUrl(env.getProperty("spring.datasource.h2.url"));
+        dataSource.setUsername(env.getProperty("spring.datasource.h2.username"));
+        dataSource.setPassword(env.getProperty("spring.datasource.h2.password"));
+        dataSource.setDriverClassName(env.getProperty("spring.datasource.h2.driverClassName"));
         dataSource.setMinIdle(5);
         dataSource.setMaxIdle(100);
         return dataSource;
